@@ -11,9 +11,6 @@ on:
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: backend
 
     steps:
       - uses: actions/checkout@v4
@@ -28,6 +25,7 @@ jobs:
 
       - name: Run tests with coverage
         run: npm test
+        working-directory: backend
 
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
