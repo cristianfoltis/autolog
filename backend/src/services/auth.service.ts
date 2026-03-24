@@ -27,7 +27,7 @@ export async function registerUser(email: string, password: string, name?: strin
 export async function loginUser(email: string, password: string) {
   const user = await prisma.user.findUnique({ where: { email } });
 
-  if (!user || !user.passwordHash) throw new Error('INVALID_CREDENTIALS');
+  if (!user?.passwordHash) throw new Error('INVALID_CREDENTIALS');
 
   const valid = await bcrypt.compare(password, user.passwordHash);
   if (!valid) throw new Error('INVALID_CREDENTIALS');
