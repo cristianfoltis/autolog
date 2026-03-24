@@ -7,6 +7,12 @@
   ],
   "scripts": {
     "dev:frontend": "npm run dev --workspace=frontend",
-    "dev:backend": "npm run dev --workspace=backend"
+    "dev:backend": "npm run dev --workspace=backend",
+    "test:frontend": "npm test --workspace=frontend",
+    "test:backend": "npm test --workspace=backend",
+    "format": "prettier --write \"**/*.{ts,tsx,json,css,md}\""
+  },
+  "devDependencies": {
+    "prettier": "3.8.1"
   }
 }

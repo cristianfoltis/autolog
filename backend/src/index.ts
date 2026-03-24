@@ -6,8 +6,11 @@ export const app = express();
 
 app.disable('x-powered-by');
 
-const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',') ?? ['http://localhost:5173'];
-app.use(cors({ origin: allowedOrigins }));
+export function getAllowedOrigins(): string[] {
+  return process.env.ALLOWED_ORIGINS?.split(',') ?? ['http://localhost:5173'];
+}
+
+app.use(cors({ origin: getAllowedOrigins() }));
 app.use(express.json());
 
 app.get('/health', (_req, res) => {
