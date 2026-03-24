@@ -1,6 +1,8 @@
 import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
+import passport from './config/passport';
+import authRoutes from './routes/auth.routes';
 
 export const app = express();
 
@@ -12,10 +14,13 @@ export function getAllowedOrigins(): string[] {
 
 app.use(cors({ origin: getAllowedOrigins() }));
 app.use(express.json());
+app.use(passport.initialize());
 
 app.get('/health', (_req, res) => {
   res.json({ status: 'ok' });
 });
+
+app.use('/auth', authRoutes);
 
 /* c8 ignore start */
 if (require.main === module) {
