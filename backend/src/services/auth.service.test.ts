@@ -9,7 +9,6 @@ import {
   signToken,
 } from './auth.service';
 
-// Mock Prisma so tests never hit the real database
 vi.mock('../prisma/client', () => ({
   default: {
     user: {
@@ -20,7 +19,6 @@ vi.mock('../prisma/client', () => ({
   },
 }));
 
-// Import the mock AFTER vi.mock so we get the mocked version
 import prisma from '../prisma/client';
 
 const mockUser = {
@@ -128,8 +126,6 @@ describe('findOrCreateGoogleUser', () => {
   });
 
   it('links googleId to existing email/password account', async () => {
-    // First call (findUnique by googleId) returns null — no Google account yet
-    // Second call (findUnique by email) returns the existing user
     vi.mocked(prisma.user.findUnique).mockResolvedValueOnce(null).mockResolvedValueOnce(mockUser);
     vi.mocked(prisma.user.update).mockResolvedValue(mockUser);
 
