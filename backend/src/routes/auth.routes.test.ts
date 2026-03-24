@@ -2,7 +2,6 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import request from 'supertest';
 import { app } from '../index';
 
-// Mock the service — routes tests should not depend on DB or bcrypt
 vi.mock('../services/auth.service', () => ({
   registerUser: vi.fn(),
   loginUser: vi.fn(),
