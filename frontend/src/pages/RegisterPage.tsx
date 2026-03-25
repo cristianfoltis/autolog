@@ -6,6 +6,8 @@ import { useAuth } from '../context/AuthContext';
 import { registerSchema } from '../schemas/auth.schema';
 import type { RegisterFormData } from '../schemas/auth.schema';
 import { getApiErrorMessage } from '../utils/api-error';
+import { Button } from '../components/ui/Button';
+import { FormField } from '../components/ui/FormField';
 
 export function RegisterPage() {
   const navigate = useNavigate();
@@ -28,92 +30,66 @@ export function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <div className="w-full max-w-md bg-white rounded-2xl shadow-sm p-8">
-        <h1 className="text-2xl font-semibold text-gray-900 mb-6">Create your account</h1>
+    <div className="min-h-screen flex items-center justify-center bg-background px-4">
+      <div className="w-full max-w-sm">
+        <div className="mb-8 text-center">
+          <h1 className="text-2xl font-semibold text-white tracking-tight">Create an account</h1>
+          <p className="mt-1.5 text-sm text-text-muted">Start tracking your vehicle history</p>
+        </div>
 
-        <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-4">
-          <div>
-            <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
-              Full name
-            </label>
-            <input
+        <div className="bg-surface rounded-2xl p-8 shadow-xl shadow-black/20">
+          <form onSubmit={handleSubmit(onSubmit)} noValidate className="flex flex-col gap-4">
+            <FormField
               id="name"
+              label="Full name"
               type="text"
               autoComplete="name"
+              error={errors.name?.message}
               {...register('name')}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
-            {errors.name && <p className="mt-1 text-xs text-red-600">{errors.name.message}</p>}
-          </div>
 
-          <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-              Email
-            </label>
-            <input
+            <FormField
               id="email"
+              label="Email"
               type="email"
               autoComplete="email"
+              error={errors.email?.message}
               {...register('email')}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
-            {errors.email && <p className="mt-1 text-xs text-red-600">{errors.email.message}</p>}
-          </div>
 
-          <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-              Password
-            </label>
-            <input
+            <FormField
               id="password"
+              label="Password"
               type="password"
               autoComplete="new-password"
+              error={errors.password?.message}
               {...register('password')}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
-            {errors.password && (
-              <p className="mt-1 text-xs text-red-600">{errors.password.message}</p>
-            )}
-          </div>
 
-          <div>
-            <label
-              htmlFor="confirmPassword"
-              className="block text-sm font-medium text-gray-700 mb-1"
-            >
-              Confirm password
-            </label>
-            <input
+            <FormField
               id="confirmPassword"
+              label="Confirm password"
               type="password"
               autoComplete="new-password"
+              error={errors.confirmPassword?.message}
               {...register('confirmPassword')}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
-            {errors.confirmPassword && (
-              <p className="mt-1 text-xs text-red-600">{errors.confirmPassword.message}</p>
+
+            {error && (
+              <p className="text-sm text-error">
+                {getApiErrorMessage(error, 'Registration failed. Please try again.')}
+              </p>
             )}
-          </div>
 
-          {error && (
-            <p className="text-sm text-red-600">
-              {getApiErrorMessage(error, 'Registration failed. Please try again.')}
-            </p>
-          )}
+            <Button type="submit" disabled={isPending}>
+              {isPending ? 'Creating account...' : 'Create account'}
+            </Button>
+          </form>
+        </div>
 
-          <button
-            type="submit"
-            disabled={isPending}
-            className="w-full bg-blue-600 text-white rounded-lg py-2 text-sm font-medium hover:bg-blue-700 disabled:opacity-50 transition-colors"
-          >
-            {isPending ? 'Creating account...' : 'Create account'}
-          </button>
-        </form>
-
-        <p className="mt-6 text-center text-sm text-gray-500">
+        <p className="mt-6 text-center text-sm text-text-muted">
           Already have an account?{' '}
-          <Link to="/login" className="text-blue-600 hover:underline font-medium">
+          <Link to="/login" className="text-brand hover:text-brand-hover font-medium transition-colors">
             Sign in
           </Link>
         </p>

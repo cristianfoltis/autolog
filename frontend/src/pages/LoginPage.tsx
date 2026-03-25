@@ -7,6 +7,8 @@ import { loginSchema } from '../schemas/auth.schema';
 import type { LoginFormData } from '../schemas/auth.schema';
 import { getApiErrorMessage } from '../utils/api-error';
 import { API_ROUTES } from '../constants/api';
+import { Button } from '../components/ui/Button';
+import { FormField } from '../components/ui/FormField';
 
 export function LoginPage() {
   const navigate = useNavigate();
@@ -32,66 +34,59 @@ export function LoginPage() {
   const googleAuthUrl = `${import.meta.env.VITE_API_URL ?? 'http://localhost:5000'}${API_ROUTES.AUTH.GOOGLE}`;
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <div className="w-full max-w-md bg-white rounded-2xl shadow-sm p-8">
-        <h1 className="text-2xl font-semibold text-gray-900 mb-6">Sign in to AutoLog</h1>
+    <div className="min-h-screen flex items-center justify-center bg-background px-4">
+      <div className="w-full max-w-sm">
+        <div className="mb-8 text-center">
+          <h1 className="text-2xl font-semibold text-white tracking-tight">Welcome back</h1>
+          <p className="mt-1.5 text-sm text-text-muted">Sign in to your AutoLog account</p>
+        </div>
 
-        <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-4">
-          <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-              Email
-            </label>
-            <input
+        <div className="bg-surface rounded-2xl p-8 shadow-xl shadow-black/20">
+          <form onSubmit={handleSubmit(onSubmit)} noValidate className="flex flex-col gap-4">
+            <FormField
               id="email"
+              label="Email"
               type="email"
               autoComplete="email"
+              error={errors.email?.message}
               {...register('email')}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
-            {errors.email && <p className="mt-1 text-xs text-red-600">{errors.email.message}</p>}
-          </div>
 
-          <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-              Password
-            </label>
-            <input
+            <FormField
               id="password"
+              label="Password"
               type="password"
               autoComplete="current-password"
+              error={errors.password?.message}
               {...register('password')}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
-            {errors.password && (
-              <p className="mt-1 text-xs text-red-600">{errors.password.message}</p>
+
+            {error && (
+              <p className="text-sm text-error">{getApiErrorMessage(error, 'Login failed. Please try again.')}</p>
             )}
+
+            <Button type="submit" disabled={isPending}>
+              {isPending ? 'Signing in...' : 'Sign in'}
+            </Button>
+          </form>
+
+          <div className="relative my-5">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-border" />
+            </div>
+            <div className="relative flex justify-center">
+              <span className="bg-surface px-3 text-xs text-text-muted">or</span>
+            </div>
           </div>
 
-          {error && (
-            <p className="text-sm text-red-600">
-              {getApiErrorMessage(error, 'Login failed. Please try again.')}
-            </p>
-          )}
+          <a href={googleAuthUrl}>
+            <Button variant="outline">Continue with Google</Button>
+          </a>
+        </div>
 
-          <button
-            type="submit"
-            disabled={isPending}
-            className="w-full bg-blue-600 text-white rounded-lg py-2 text-sm font-medium hover:bg-blue-700 disabled:opacity-50 transition-colors"
-          >
-            {isPending ? 'Signing in...' : 'Sign in'}
-          </button>
-        </form>
-
-        <a
-          href={googleAuthUrl}
-          className="mt-3 w-full flex items-center justify-center gap-2 border border-gray-300 rounded-lg py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
-        >
-          Continue with Google
-        </a>
-
-        <p className="mt-6 text-center text-sm text-gray-500">
+        <p className="mt-6 text-center text-sm text-text-muted">
           Don&apos;t have an account?{' '}
-          <Link to="/register" className="text-blue-600 hover:underline font-medium">
+          <Link to="/register" className="text-brand hover:text-brand-hover font-medium transition-colors">
             Sign up
           </Link>
         </p>
