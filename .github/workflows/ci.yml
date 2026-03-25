@@ -1,6 +1,9 @@
 name: CI
 
 on:
+  push:
+    branches:
+      - main
   pull_request:
     branches:
       - main
@@ -21,6 +24,10 @@ jobs:
 
       - name: Install dependencies
         run: rm -f package-lock.json && npm install
+
+      - name: Generate Prisma client
+        run: npx prisma generate
+        working-directory: backend
 
       - name: Run backend tests
         run: npm test
