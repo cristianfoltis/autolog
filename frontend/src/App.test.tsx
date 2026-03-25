@@ -1,18 +1,14 @@
-import { render, screen, fireEvent } from '@testing-library/react';
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
+import { render, screen } from '@testing-library/react';
 import App from './App';
 
-describe('App', () => {
-  it('renders get started heading', () => {
-    render(<App />);
-    expect(screen.getByText('Get started')).toBeInTheDocument();
-  });
+vi.mock('./router', () => ({
+  AppRouter: () => <div data-testid="app-router">Router</div>,
+}));
 
-  it('increments counter on button click', () => {
+describe('App', () => {
+  it('renders the app router', () => {
     render(<App />);
-    const button = screen.getByRole('button', { name: /count is/i });
-    expect(button).toHaveTextContent('Count is 0');
-    fireEvent.click(button);
-    expect(button).toHaveTextContent('Count is 1');
+    expect(screen.getByTestId('app-router')).toBeInTheDocument();
   });
 });
