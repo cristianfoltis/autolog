@@ -34,6 +34,51 @@ describe('RegisterPage', () => {
     });
   });
 
+  it('shows name validation error', async () => {
+    renderWithProviders(<RegisterPage />);
+    await waitFor(() => screen.getByLabelText('Full name'));
+
+    await userEvent.type(screen.getByLabelText('Full name'), 'A');
+    await userEvent.type(screen.getByLabelText('Email'), 'user@test.com');
+    await userEvent.type(screen.getByLabelText('Password'), 'password123');
+    await userEvent.type(screen.getByLabelText('Confirm password'), 'password123');
+    await userEvent.click(screen.getByRole('button', { name: /create account/i }));
+
+    await waitFor(() => {
+      expect(screen.getByText('Name must be at least 2 characters')).toBeInTheDocument();
+    });
+  });
+
+  it('shows email validation error', async () => {
+    renderWithProviders(<RegisterPage />);
+    await waitFor(() => screen.getByLabelText('Full name'));
+
+    await userEvent.type(screen.getByLabelText('Full name'), 'Test User');
+    await userEvent.type(screen.getByLabelText('Email'), 'not-an-email');
+    await userEvent.type(screen.getByLabelText('Password'), 'password123');
+    await userEvent.type(screen.getByLabelText('Confirm password'), 'password123');
+    await userEvent.click(screen.getByRole('button', { name: /create account/i }));
+
+    await waitFor(() => {
+      expect(screen.getByText('Please enter a valid email')).toBeInTheDocument();
+    });
+  });
+
+  it('shows password validation error', async () => {
+    renderWithProviders(<RegisterPage />);
+    await waitFor(() => screen.getByLabelText('Full name'));
+
+    await userEvent.type(screen.getByLabelText('Full name'), 'Test User');
+    await userEvent.type(screen.getByLabelText('Email'), 'user@test.com');
+    await userEvent.type(screen.getByLabelText('Password'), 'short');
+    await userEvent.type(screen.getByLabelText('Confirm password'), 'short');
+    await userEvent.click(screen.getByRole('button', { name: /create account/i }));
+
+    await waitFor(() => {
+      expect(screen.getByText('Password must be at least 8 characters')).toBeInTheDocument();
+    });
+  });
+
   it('shows password mismatch error', async () => {
     renderWithProviders(<RegisterPage />);
     await waitFor(() => screen.getByLabelText('Full name'));

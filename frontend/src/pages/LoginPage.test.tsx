@@ -4,6 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { AxiosError } from 'axios';
 import { renderWithProviders } from '../test/render-with-providers';
 import { LoginPage } from './LoginPage';
+import * as useLoginHook from '../hooks/useLogin';
 
 vi.mock('../api/axios', () => ({
   default: {
@@ -15,8 +16,11 @@ vi.mock('../api/axios', () => ({
 
 import api from '../api/axios';
 
+const TEST_EMAIL = 'user@test.com';
+const TEST_PASSWORD = 'password123';
+
 beforeEach(() => {
-  vi.clearAllMocks();
+  vi.restoreAllMocks();
   localStorage.clear();
   vi.mocked(api.get).mockRejectedValue(new Error('no session'));
 });
@@ -49,7 +53,7 @@ describe('LoginPage', () => {
         token: 'tok',
         user: {
           id: '1',
-          email: 'user@test.com',
+          email: TEST_EMAIL,
           name: null,
           googleId: null,
           createdAt: '',
@@ -61,15 +65,40 @@ describe('LoginPage', () => {
     renderWithProviders(<LoginPage />);
     await waitFor(() => screen.getByLabelText('Email'));
 
-    await userEvent.type(screen.getByLabelText('Email'), 'user@test.com');
-    await userEvent.type(screen.getByLabelText('Password'), 'password123');
+    await userEvent.type(screen.getByLabelText('Email'), TEST_EMAIL);
+    await userEvent.type(screen.getByLabelText('Password'), TEST_PASSWORD);
     await userEvent.click(screen.getByRole('button', { name: /sign in/i }));
 
     await waitFor(() => {
       expect(api.post).toHaveBeenCalledWith('/auth/login', {
-        email: 'user@test.com',
-        password: 'password123',
+        email: TEST_EMAIL,
+        password: TEST_PASSWORD,
       });
+    });
+  });
+
+  it('shows password validation error', async () => {
+    renderWithProviders(<LoginPage />);
+    await waitFor(() => screen.getByLabelText('Email'));
+
+    await userEvent.type(screen.getByLabelText('Email'), TEST_EMAIL);
+    await userEvent.click(screen.getByRole('button', { name: /sign in/i }));
+
+    await waitFor(() => {
+      expect(screen.getByText('Password is required')).toBeInTheDocument();
+    });
+  });
+
+  it('shows Signing in... while request is pending', async () => {
+    vi.spyOn(useLoginHook, 'useLogin').mockReturnValue({
+      mutate: vi.fn(),
+      isPending: true,
+      error: null,
+    } as unknown as ReturnType<typeof useLoginHook.useLogin>);
+
+    renderWithProviders(<LoginPage />);
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: /signing in/i })).toBeInTheDocument();
     });
   });
 
@@ -81,7 +110,7 @@ describe('LoginPage', () => {
     renderWithProviders(<LoginPage />);
     await waitFor(() => screen.getByLabelText('Email'));
 
-    await userEvent.type(screen.getByLabelText('Email'), 'user@test.com');
+    await userEvent.type(screen.getByLabelText('Email'), TEST_EMAIL);
     await userEvent.type(screen.getByLabelText('Password'), 'wrongpassword');
     await userEvent.click(screen.getByRole('button', { name: /sign in/i }));
 

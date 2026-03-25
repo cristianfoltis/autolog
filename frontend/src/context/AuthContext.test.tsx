@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { screen, waitFor, act } from '@testing-library/react';
+import { render, screen, waitFor, act } from '@testing-library/react';
 import { renderWithProviders } from '../test/render-with-providers';
 import { useAuth } from './AuthContext';
 
@@ -66,10 +66,14 @@ describe('useAuth', () => {
   it('throws when used outside AuthProvider', () => {
     const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
 
-    expect(() => {
-      const { unmount } = renderWithProviders(<AuthConsumer />);
-      unmount();
-    }).not.toThrow();
+    function ConsumerOutsideProvider() {
+      useAuth();
+      return null;
+    }
+
+    expect(() => render(<ConsumerOutsideProvider />)).toThrow(
+      'useAuth must be used within AuthProvider',
+    );
 
     consoleError.mockRestore();
   });

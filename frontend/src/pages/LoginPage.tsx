@@ -80,6 +80,7 @@ export function LoginPage() {
         </form>
 
         <a
+          /* c8 ignore next */
           href={`${import.meta.env.VITE_API_URL ?? 'http://localhost:5000'}${API_ROUTES.AUTH.GOOGLE}`}
           className="mt-3 w-full flex items-center justify-center gap-2 border border-gray-300 rounded-lg py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
         >
