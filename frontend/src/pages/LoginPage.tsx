@@ -9,6 +9,8 @@ import { getApiErrorMessage } from '../utils/api-error';
 import { API_ROUTES } from '../constants/api';
 import { Button } from '../components/ui/Button';
 import { FormField } from '../components/ui/FormField';
+import { Panel } from '../components/ui/Panel';
+import { PageLayout } from '../components/ui/PageLayout';
 
 export function LoginPage() {
   const navigate = useNavigate();
@@ -34,14 +36,14 @@ export function LoginPage() {
   const googleAuthUrl = `${import.meta.env.VITE_API_URL ?? 'http://localhost:5000'}${API_ROUTES.AUTH.GOOGLE}`;
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background px-4">
+    <PageLayout>
       <div className="w-full max-w-sm">
         <div className="mb-8 text-center">
           <h1 className="text-2xl font-semibold text-white tracking-tight">Welcome back</h1>
           <p className="mt-1.5 text-sm text-text-muted">Sign in to your AutoLog account</p>
         </div>
 
-        <div className="bg-surface rounded-2xl p-8 shadow-xl shadow-black/20">
+        <Panel>
           <form onSubmit={handleSubmit(onSubmit)} noValidate className="flex flex-col gap-4">
             <FormField
               id="email"
@@ -62,7 +64,9 @@ export function LoginPage() {
             />
 
             {error && (
-              <p className="text-sm text-error">{getApiErrorMessage(error, 'Login failed. Please try again.')}</p>
+              <p className="text-sm text-error">
+                {getApiErrorMessage(error, 'Login failed. Please try again.')}
+              </p>
             )}
 
             <Button type="submit" disabled={isPending}>
@@ -82,15 +86,18 @@ export function LoginPage() {
           <a href={googleAuthUrl}>
             <Button variant="outline">Continue with Google</Button>
           </a>
-        </div>
+        </Panel>
 
         <p className="mt-6 text-center text-sm text-text-muted">
           Don&apos;t have an account?{' '}
-          <Link to="/register" className="text-brand hover:text-brand-hover font-medium transition-colors">
+          <Link
+            to="/register"
+            className="text-brand hover:text-brand-hover font-medium transition-colors"
+          >
             Sign up
           </Link>
         </p>
       </div>
-    </div>
+    </PageLayout>
   );
 }

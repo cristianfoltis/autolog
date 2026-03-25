@@ -8,7 +8,13 @@ interface Props {
   readonly onClick?: () => void;
 }
 
-export function Button({ children, type = 'button', disabled, variant = 'primary', onClick }: Props) {
+export function Button({
+  children,
+  type = 'button',
+  disabled,
+  variant = 'primary',
+  onClick,
+}: Props) {
   const base =
     'w-full flex items-center justify-center gap-2 rounded-lg py-2.5 text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed';
 
@@ -18,7 +24,12 @@ export function Button({ children, type = 'button', disabled, variant = 'primary
   };
 
   return (
-    <button type={type} disabled={disabled} onClick={onClick} className={`${base} ${variants[variant]}`}>
+    <button
+      type={type}
+      disabled={disabled}
+      onClick={onClick}
+      className={`${base} ${variants[variant]}`}
+    >
       {children}
     </button>
   );

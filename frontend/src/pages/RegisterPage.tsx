@@ -8,6 +8,8 @@ import type { RegisterFormData } from '../schemas/auth.schema';
 import { getApiErrorMessage } from '../utils/api-error';
 import { Button } from '../components/ui/Button';
 import { FormField } from '../components/ui/FormField';
+import { Panel } from '../components/ui/Panel';
+import { PageLayout } from '../components/ui/PageLayout';
 
 export function RegisterPage() {
   const navigate = useNavigate();
@@ -30,14 +32,14 @@ export function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background px-4">
+    <PageLayout>
       <div className="w-full max-w-sm">
         <div className="mb-8 text-center">
           <h1 className="text-2xl font-semibold text-white tracking-tight">Create an account</h1>
           <p className="mt-1.5 text-sm text-text-muted">Start tracking your vehicle history</p>
         </div>
 
-        <div className="bg-surface rounded-2xl p-8 shadow-xl shadow-black/20">
+        <Panel>
           <form onSubmit={handleSubmit(onSubmit)} noValidate className="flex flex-col gap-4">
             <FormField
               id="name"
@@ -85,15 +87,18 @@ export function RegisterPage() {
               {isPending ? 'Creating account...' : 'Create account'}
             </Button>
           </form>
-        </div>
+        </Panel>
 
         <p className="mt-6 text-center text-sm text-text-muted">
           Already have an account?{' '}
-          <Link to="/login" className="text-brand hover:text-brand-hover font-medium transition-colors">
+          <Link
+            to="/login"
+            className="text-brand hover:text-brand-hover font-medium transition-colors"
+          >
             Sign in
           </Link>
         </p>
       </div>
-    </div>
+    </PageLayout>
   );
 }
