@@ -4,6 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { AxiosError } from 'axios';
 import { renderWithProviders } from '../test/render-with-providers';
 import { RegisterPage } from './RegisterPage';
+import * as useRegisterHook from '../hooks/useRegister';
 
 vi.mock('../api/axios', () => ({
   default: {
@@ -16,7 +17,7 @@ vi.mock('../api/axios', () => ({
 import api from '../api/axios';
 
 beforeEach(() => {
-  vi.clearAllMocks();
+  vi.restoreAllMocks();
   localStorage.clear();
   vi.mocked(api.get).mockRejectedValue(new Error('no session'));
 });
@@ -124,6 +125,19 @@ describe('RegisterPage', () => {
         email: 'user@test.com',
         password: 'password123',
       });
+    });
+  });
+
+  it('shows Creating account... while request is pending', async () => {
+    vi.spyOn(useRegisterHook, 'useRegister').mockReturnValue({
+      mutate: vi.fn(),
+      isPending: true,
+      error: null,
+    } as unknown as ReturnType<typeof useRegisterHook.useRegister>);
+
+    renderWithProviders(<RegisterPage />);
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: /creating account/i })).toBeInTheDocument();
     });
   });
 
