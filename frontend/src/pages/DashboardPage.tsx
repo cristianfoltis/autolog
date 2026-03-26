@@ -4,18 +4,19 @@ export function DashboardPage() {
   const { user, logout } = useAuth();
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
-      <div className="max-w-xl mx-auto">
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-semibold text-gray-900">Dashboard</h1>
+    <div className="min-h-screen bg-background p-8">
+      <div className="max-w-xl mx-auto flex flex-col gap-6">
+        <div className="flex items-center justify-between">
+          <h1 className="text-2xl font-semibold text-white">Dashboard</h1>
           <button
             onClick={logout}
-            className="text-sm text-gray-500 hover:text-gray-700 transition-colors"
+            className="text-sm text-text-muted hover:text-white transition-colors"
           >
             Sign out
           </button>
         </div>
-        <p className="text-gray-600">Welcome, {user?.name ?? user?.email}</p>
+
+        <p className="text-text-secondary">Welcome, {user?.name ?? user?.email}</p>
       </div>
     </div>
   );
