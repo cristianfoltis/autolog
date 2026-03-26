@@ -69,8 +69,8 @@ export function LoginPage() {
               </p>
             )}
 
-            <Button type="submit" disabled={isPending}>
-              {isPending ? 'Signing in...' : 'Sign in'}
+            <Button type="submit" loading={isPending}>
+              Sign in
             </Button>
           </form>
 

@@ -83,8 +83,8 @@ export function RegisterPage() {
               </p>
             )}
 
-            <Button type="submit" disabled={isPending}>
-              {isPending ? 'Creating account...' : 'Create account'}
+            <Button type="submit" loading={isPending}>
+              Create account
             </Button>
           </form>
         </Panel>
