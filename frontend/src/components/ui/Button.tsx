@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { cn } from '../../utils/cn';
 
 interface Props {
   readonly children: ReactNode;
@@ -8,6 +9,11 @@ interface Props {
   readonly onClick?: () => void;
 }
 
+const variants = {
+  primary: 'bg-brand text-white hover:bg-brand-hover',
+  outline: 'border border-border text-text-primary hover:bg-gray-50',
+};
+
 export function Button({
   children,
   type = 'button',
@@ -15,20 +21,19 @@ export function Button({
   variant = 'primary',
   onClick,
 }: Props) {
-  const base =
-    'w-full flex items-center justify-center gap-2 rounded-lg py-2.5 text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed';
-
-  const variants = {
-    primary: 'bg-brand text-white hover:bg-brand-hover',
-    outline: 'border border-border text-text-primary hover:bg-gray-50',
-  };
-
   return (
     <button
       type={type}
       disabled={disabled}
       onClick={onClick}
-      className={`${base} ${variants[variant]}`}
+      className={cn(
+        'w-full flex items-center justify-center gap-2',
+        'rounded-lg py-2.5',
+        'text-sm font-medium',
+        'transition-colors',
+        'disabled:opacity-50 disabled:cursor-not-allowed',
+        variants[variant],
+      )}
     >
       {children}
     </button>
