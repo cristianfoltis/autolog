@@ -128,7 +128,7 @@ describe('RegisterPage', () => {
     });
   });
 
-  it('shows Creating account... while request is pending', async () => {
+  it('shows spinner and disables button while request is pending', async () => {
     vi.spyOn(useRegisterHook, 'useRegister').mockReturnValue({
       mutate: vi.fn(),
       isPending: true,
@@ -137,7 +137,9 @@ describe('RegisterPage', () => {
 
     renderWithProviders(<RegisterPage />);
     await waitFor(() => {
-      expect(screen.getByRole('button', { name: /creating account/i })).toBeInTheDocument();
+      const button = screen.getByRole('button', { name: /create account/i });
+      expect(button).toBeDisabled();
+      expect(button.querySelector('svg')).toBeInTheDocument();
     });
   });
 

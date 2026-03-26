@@ -1,10 +1,12 @@
 import type { ReactNode } from 'react';
 import { cn } from '../../utils/cn';
+import { Spinner } from './Spinner';
 
 interface Props {
   readonly children: ReactNode;
   readonly type?: 'button' | 'submit';
   readonly disabled?: boolean;
+  readonly loading?: boolean;
   readonly variant?: 'primary' | 'outline';
   readonly onClick?: () => void;
 }
@@ -18,13 +20,14 @@ export function Button({
   children,
   type = 'button',
   disabled,
+  loading,
   variant = 'primary',
   onClick,
 }: Props) {
   return (
     <button
       type={type}
-      disabled={disabled}
+      disabled={disabled || loading}
       onClick={onClick}
       className={cn(
         'w-full flex items-center justify-center gap-2',
@@ -35,6 +38,7 @@ export function Button({
         variants[variant],
       )}
     >
+      {loading && <Spinner />}
       {children}
     </button>
   );

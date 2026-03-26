@@ -89,7 +89,7 @@ describe('LoginPage', () => {
     });
   });
 
-  it('shows Signing in... while request is pending', async () => {
+  it('shows spinner and disables button while request is pending', async () => {
     vi.spyOn(useLoginHook, 'useLogin').mockReturnValue({
       mutate: vi.fn(),
       isPending: true,
@@ -98,7 +98,9 @@ describe('LoginPage', () => {
 
     renderWithProviders(<LoginPage />);
     await waitFor(() => {
-      expect(screen.getByRole('button', { name: /signing in/i })).toBeInTheDocument();
+      const button = screen.getByRole('button', { name: /sign in/i });
+      expect(button).toBeDisabled();
+      expect(button.querySelector('svg')).toBeInTheDocument();
     });
   });
 

@@ -24,6 +24,21 @@ describe('Button', () => {
     expect(screen.getByRole('button')).toBeDisabled();
   });
 
+  it('is disabled when loading prop is true', () => {
+    render(<Button loading>Click me</Button>);
+    expect(screen.getByRole('button')).toBeDisabled();
+  });
+
+  it('shows spinner when loading', () => {
+    const { container } = render(<Button loading>Click me</Button>);
+    expect(container.querySelector('svg')).toBeInTheDocument();
+  });
+
+  it('does not show spinner when not loading', () => {
+    const { container } = render(<Button>Click me</Button>);
+    expect(container.querySelector('svg')).not.toBeInTheDocument();
+  });
+
   it('calls onClick when clicked', async () => {
     const user = userEvent.setup();
     const onClick = vi.fn();
