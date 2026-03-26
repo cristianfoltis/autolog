@@ -3,6 +3,8 @@ import express from 'express';
 import cors from 'cors';
 import passport from './config/passport';
 import authRoutes from './routes/auth.routes';
+import lovRoutes from './routes/lov.routes';
+import vehicleRoutes from './routes/vehicle.routes';
 
 export const app = express();
 
@@ -21,6 +23,8 @@ app.get('/health', (_req, res) => {
 });
 
 app.use('/auth', authRoutes);
+app.use('/lov', lovRoutes);
+app.use('/vehicles', vehicleRoutes);
 
 /* c8 ignore start */
 if (require.main === module) {
