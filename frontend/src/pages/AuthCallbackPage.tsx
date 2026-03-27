@@ -24,7 +24,7 @@ export function AuthCallbackPage() {
       })
       .then((res) => {
         login({ token, user: res.data });
-        navigate('/');
+        navigate('/dashboard');
       })
       .catch(() => navigate('/login'));
   }, [searchParams, login, navigate]);

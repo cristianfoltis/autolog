@@ -19,14 +19,14 @@ beforeEach(() => {
 });
 
 describe('ProtectedRoute', () => {
-  it('redirects to /login when not authenticated', async () => {
+  it('redirects to / when not authenticated', async () => {
     vi.mocked(api.get).mockRejectedValue(new Error('Unauthorized'));
 
     renderWithProviders(
       <Routes>
-        <Route path="/login" element={<div>Login Page</div>} />
+        <Route path="/" element={<div>Landing Page</div>} />
         <Route
-          path="/"
+          path="/dashboard"
           element={
             <ProtectedRoute>
               <div>Protected Content</div>
@@ -34,10 +34,11 @@ describe('ProtectedRoute', () => {
           }
         />
       </Routes>,
+      { initialRoute: '/dashboard' },
     );
 
     await waitFor(() => {
-      expect(screen.getByText('Login Page')).toBeInTheDocument();
+      expect(screen.getByText('Landing Page')).toBeInTheDocument();
       expect(screen.queryByText('Protected Content')).not.toBeInTheDocument();
     });
   });
