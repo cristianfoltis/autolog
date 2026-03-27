@@ -27,7 +27,7 @@ export function LoginPage() {
     mutate(data, {
       onSuccess: (response) => {
         login(response);
-        navigate('/');
+        navigate('/dashboard');
       },
     });
   }

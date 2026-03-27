@@ -26,7 +26,7 @@ export function RegisterPage() {
     mutate(data, {
       onSuccess: (response) => {
         login(response);
-        navigate('/');
+        navigate('/dashboard');
       },
     });
   }
