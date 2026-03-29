@@ -1,7 +1,17 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { screen } from '@testing-library/react';
+import { Route, Routes } from 'react-router-dom';
 import { renderWithProviders } from '../test/render-with-providers';
 import { LandingPage } from './LandingPage';
+
+vi.mock('../api/axios', () => ({
+  default: {
+    get: vi.fn(),
+    interceptors: { request: { use: vi.fn() } },
+  },
+}));
+
+import api from '../api/axios';
 
 describe('LandingPage', () => {
   it('renders headline', () => {
@@ -27,5 +37,20 @@ describe('LandingPage', () => {
   it('renders footer with copyright', () => {
     renderWithProviders(<LandingPage />);
     expect(screen.getByText(/autolog/i, { selector: 'p' })).toBeInTheDocument();
+  });
+
+  it('redirects to /dashboard when already authenticated', async () => {
+    localStorage.setItem('autolog_token', 'valid-token');
+    vi.mocked(api.get).mockResolvedValue({ data: { email: 'user@test.com', name: 'Test' } });
+
+    renderWithProviders(
+      <Routes>
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/dashboard" element={<div>Dashboard</div>} />
+      </Routes>,
+    );
+
+    await screen.findByText('Dashboard');
+    expect(screen.queryByText(/know your cars/i)).not.toBeInTheDocument();
   });
 });

@@ -15,8 +15,8 @@ import { Button } from '../ui/Button';
 import { getApiErrorMessage } from '../../utils/api-error';
 
 interface Props {
-  vehicle?: Vehicle;
-  onClose: () => void;
+  readonly vehicle?: Vehicle;
+  readonly onClose: () => void;
 }
 
 export function VehicleFormModal({ vehicle, onClose }: Props) {
@@ -75,7 +75,12 @@ export function VehicleFormModal({ vehicle, onClose }: Props) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
+      <button
+        type="button"
+        className="absolute inset-0 bg-black/60 backdrop-blur-sm cursor-default"
+        onClick={onClose}
+        aria-label="Close modal"
+      />
 
       <div className="relative bg-white text-text-primary rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto">
         <div className="p-6">

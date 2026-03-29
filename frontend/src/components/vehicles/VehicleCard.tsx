@@ -2,9 +2,9 @@ import { Car, Pencil, Trash2 } from 'lucide-react';
 import type { Vehicle } from '../../types/vehicle.types';
 
 interface Props {
-  vehicle: Vehicle;
-  onEdit: (vehicle: Vehicle) => void;
-  onDelete: (vehicle: Vehicle) => void;
+  readonly vehicle: Vehicle;
+  readonly onEdit: (vehicle: Vehicle) => void;
+  readonly onDelete: (vehicle: Vehicle) => void;
 }
 
 export function VehicleCard({ vehicle, onEdit, onDelete }: Props) {

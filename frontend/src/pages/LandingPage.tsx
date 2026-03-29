@@ -1,5 +1,6 @@
-import { Link } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 import { Car, Wrench, ClipboardList } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 import logo from '../assets/final-logo.svg';
 import audiLogo from '../assets/audi-logo-svg.svg';
 import fordLogo from '../assets/ford-logo-svg.svg';
@@ -38,6 +39,10 @@ const features = [
 ];
 
 export function LandingPage() {
+  const { isAuthenticated } = useAuth();
+
+  if (isAuthenticated) return <Navigate to="/dashboard" replace />;
+
   return (
     <div className="h-screen bg-background text-white flex flex-col overflow-hidden">
       <nav className="flex items-center justify-between px-6 py-4 max-w-6xl mx-auto w-full shrink-0">
@@ -60,9 +65,8 @@ export function LandingPage() {
 
       <main className="flex-1 flex flex-col items-center justify-between px-6 pb-6 max-w-6xl mx-auto w-full">
         <div className="flex flex-col items-center text-center pt-8">
-          <div className="inline-flex items-center gap-2 bg-white/5 border border-white/10 rounded-full px-4 py-1.5 text-xs text-text-secondary mb-6 tracking-wide uppercase">
-            <span className="w-1.5 h-1.5 rounded-full bg-brand" />
-            Vehicle management, simplified
+          <div className="inline-flex items-center gap-2 bg-white/5 border border-white/10 rounded-full px-4 py-1.5 text-xs text-text-secondary mb-6 tracking-wide uppercase before:w-1.5 before:h-1.5 before:rounded-full before:bg-brand before:shrink-0">
+            <span>Vehicle management, simplified</span>
           </div>
 
           <h1 className="text-4xl md:text-6xl font-bold tracking-tight leading-tight mb-4 max-w-2xl">
