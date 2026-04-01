@@ -40,7 +40,7 @@ describe('AuthCallbackPage', () => {
       { initialRoute: '/auth/callback?token=abc123' },
     );
 
-    await screen.findByText('Dashboard');
+    expect(await screen.findByText('Dashboard')).toBeInTheDocument();
   });
 
   it('redirects to /login when token is missing', async () => {
@@ -52,7 +52,7 @@ describe('AuthCallbackPage', () => {
       { initialRoute: '/auth/callback' },
     );
 
-    await screen.findByText('Login');
+    expect(await screen.findByText('Login')).toBeInTheDocument();
   });
 
   it('redirects to /login when API call fails', async () => {
@@ -66,6 +66,6 @@ describe('AuthCallbackPage', () => {
       { initialRoute: '/auth/callback?token=bad-token' },
     );
 
-    await waitFor(() => screen.getByText('Login'));
+    await waitFor(() => expect(screen.getByText('Login')).toBeInTheDocument());
   });
 });
