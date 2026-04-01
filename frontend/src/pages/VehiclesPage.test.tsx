@@ -112,11 +112,24 @@ describe('VehiclesPage', () => {
     });
   });
 
+  it('opens add modal from empty state button', async () => {
+    vi.mocked(useVehicles).mockReturnValue({ data: [], isLoading: false } as any);
+    renderWithProviders(<VehiclesPage />);
+
+    // index 1 = empty state button (index 0 = header button)
+    const buttons = screen.getAllByRole('button', { name: 'Add vehicle' });
+    fireEvent.click(buttons[1]);
+
+    await waitFor(() => {
+      expect(screen.getByRole('heading', { name: 'Add vehicle' })).toBeInTheDocument();
+    });
+  });
+
   it('calls deleteVehicle when confirmed', () => {
     const mutate = vi.fn();
     vi.mocked(useDeleteVehicle).mockReturnValue({ mutate } as any);
     vi.mocked(useVehicles).mockReturnValue({ data: [mockVehicle], isLoading: false } as any);
-    vi.spyOn(window, 'confirm').mockReturnValue(true);
+    vi.spyOn(globalThis, 'confirm').mockReturnValue(true);
 
     renderWithProviders(<VehiclesPage />);
     fireEvent.click(screen.getByLabelText('Delete vehicle'));
@@ -128,7 +141,7 @@ describe('VehiclesPage', () => {
     const mutate = vi.fn();
     vi.mocked(useDeleteVehicle).mockReturnValue({ mutate } as any);
     vi.mocked(useVehicles).mockReturnValue({ data: [mockVehicle], isLoading: false } as any);
-    vi.spyOn(window, 'confirm').mockReturnValue(false);
+    vi.spyOn(globalThis, 'confirm').mockReturnValue(false);
 
     renderWithProviders(<VehiclesPage />);
     fireEvent.click(screen.getByLabelText('Delete vehicle'));

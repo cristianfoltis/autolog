@@ -26,6 +26,11 @@ app.use('/auth', authRoutes);
 app.use('/lov', lovRoutes);
 app.use('/vehicles', vehicleRoutes);
 
+app.use((err: Error, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
+  console.error(err);
+  res.status(500).json({ error: 'Internal server error' });
+});
+
 /* c8 ignore start */
 if (require.main === module) {
   const PORT = process.env.PORT ?? 5000;

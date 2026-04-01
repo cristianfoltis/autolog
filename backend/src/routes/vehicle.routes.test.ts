@@ -55,7 +55,7 @@ let token: string;
 beforeEach(() => {
   vi.clearAllMocks();
   vi.stubEnv('JWT_SECRET', 'test-secret');
-  token = jwt.sign({ sub: 'user-1' }, 'test-secret');
+  token = jwt.sign({ sub: 'user-1' }, process.env.JWT_SECRET as string);
   vi.mocked(prisma.user.findUnique).mockResolvedValue(mockUser);
 });
 
@@ -153,6 +153,17 @@ describe('POST /vehicles', () => {
     expect(res.status).toBe(409);
     expect(res.body.error).toBe('A vehicle with this plate already exists');
   });
+
+  it('re-throws non-P2002 errors on POST', async () => {
+    vi.mocked(createVehicle).mockRejectedValue(new Error('Database connection lost'));
+
+    const res = await request(app)
+      .post('/vehicles')
+      .set('Authorization', `Bearer ${token}`)
+      .send(validBody);
+
+    expect(res.status).toBe(500);
+  });
 });
 
 describe('PUT /vehicles/:id', () => {
@@ -178,6 +189,17 @@ describe('PUT /vehicles/:id', () => {
 
     expect(res.status).toBe(404);
     expect(res.body.error).toBe('Vehicle not found');
+  });
+
+  it('re-throws non-P2002 errors on PUT', async () => {
+    vi.mocked(updateVehicle).mockRejectedValue(new Error('Database connection lost'));
+
+    const res = await request(app)
+      .put('/vehicles/vehicle-1')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ mileage: 60000 });
+
+    expect(res.status).toBe(500);
   });
 
   it('returns 409 when updated plate already exists', async () => {

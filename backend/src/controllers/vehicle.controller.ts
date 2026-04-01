@@ -1,4 +1,4 @@
-import type { Request, Response } from 'express';
+import type { Request, Response, NextFunction } from 'express';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import {
   getUserVehicles,
@@ -24,7 +24,7 @@ export async function getVehicle(req: Request<{ id: string }>, res: Response) {
   res.json(vehicle);
 }
 
-export async function createVehicleHandler(req: Request, res: Response) {
+export async function createVehicleHandler(req: Request, res: Response, next: NextFunction) {
   const { plate, year, vin, mileage, mileageUnit, makeId, modelId } = req.body;
 
   if (!plate || !year || mileage === undefined || !makeId || !modelId) {
@@ -48,11 +48,15 @@ export async function createVehicleHandler(req: Request, res: Response) {
       res.status(409).json({ error: 'A vehicle with this plate already exists' });
       return;
     }
-    throw err;
+    next(err);
   }
 }
 
-export async function updateVehicleHandler(req: Request<{ id: string }>, res: Response) {
+export async function updateVehicleHandler(
+  req: Request<{ id: string }>,
+  res: Response,
+  next: NextFunction,
+) {
   const { plate, year, vin, mileage, mileageUnit, makeId, modelId } = req.body;
 
   try {
@@ -77,7 +81,7 @@ export async function updateVehicleHandler(req: Request<{ id: string }>, res: Re
       res.status(409).json({ error: 'A vehicle with this plate already exists' });
       return;
     }
-    throw err;
+    next(err);
   }
 }
 
