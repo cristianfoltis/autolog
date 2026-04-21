@@ -8,11 +8,48 @@ datasource db {
 }
 
 model User {
-  id           String   @id @default(cuid())
-  email        String   @unique
+  id           String    @id @default(cuid())
+  email        String    @unique
   name         String?
   passwordHash String?
-  googleId     String?  @unique
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  googleId     String?   @unique
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  vehicles     Vehicle[]
+}
+
+model Make {
+  id       Int       @id @default(autoincrement())
+  name     String    @unique
+  models   Model[]
+  vehicles Vehicle[]
+}
+
+model Model {
+  id       Int       @id @default(autoincrement())
+  name     String
+  makeId   Int
+  make     Make      @relation(fields: [makeId], references: [id])
+  vehicles Vehicle[]
+
+  @@unique([name, makeId])
+}
+
+model Vehicle {
+  id          String   @id @default(cuid())
+  plate       String
+  year        Int
+  vin         String?
+  mileage     Int
+  mileageUnit String   @default("km")
+  makeId      Int
+  modelId     Int
+  make        Make     @relation(fields: [makeId], references: [id])
+  model       Model    @relation(fields: [modelId], references: [id])
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([plate, userId])
 }
