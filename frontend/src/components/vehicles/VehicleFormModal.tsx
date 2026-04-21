@@ -1,6 +1,6 @@
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { X } from 'lucide-react';
+import { X, Search } from 'lucide-react';
 import { toast } from 'sonner';
 import { vehicleSchema } from '../../schemas/vehicle.schema';
 import type { VehicleFormData } from '../../schemas/vehicle.schema';
@@ -9,6 +9,7 @@ import { useCreateVehicle } from '../../hooks/useCreateVehicle';
 import { useUpdateVehicle } from '../../hooks/useUpdateVehicle';
 import { useMakes } from '../../hooks/useMakes';
 import { useModels } from '../../hooks/useModels';
+import { useVinLookup } from '../../hooks/useVinLookup';
 import { FormField } from '../ui/FormField';
 import { SelectField } from '../ui/SelectField';
 import { Button } from '../ui/Button';
@@ -49,8 +50,29 @@ export function VehicleFormModal({ vehicle, onClose }: Props) {
   });
 
   const makeId = watch('makeId');
+  const vin = watch('vin');
   const { data: makes = [] } = useMakes();
   const { data: models = [] } = useModels(makeId ? Number(makeId) : null);
+  const { mutate: lookupVin, isPending: lookingUp } = useVinLookup();
+
+  function handleVinLookup() {
+    if (vin?.length !== 17) return;
+    lookupVin(vin, {
+      onSuccess: (result) => {
+        setValue('year', result.year);
+        setValue('makeId', result.makeId);
+        setValue('modelId', result.modelId ?? 0);
+        if (result.modelId) {
+          toast.success(`Found: ${result.makeName} ${result.modelName} (${result.year})`);
+        } else {
+          toast.warning(`Found: ${result.makeName} (${result.year}). Please select the model.`);
+        }
+      },
+      onError: () => {
+        toast.warning('VIN not recognised. Please fill in the details manually.');
+      },
+    });
+  }
 
   function onSubmit(data: VehicleFormData) {
     if (isEdit) {
@@ -161,13 +183,32 @@ export function VehicleFormModal({ vehicle, onClose }: Props) {
               {...register('plate')}
             />
 
-            <FormField
-              id="vin"
-              label="VIN (optional)"
-              placeholder="1HGBH41JXMN109186"
-              error={errors.vin?.message}
-              {...register('vin')}
-            />
+            <div>
+              <label htmlFor="vin" className="block text-sm font-medium text-text-secondary mb-1">
+                VIN (optional)
+              </label>
+              <div className="flex gap-2">
+                <input
+                  id="vin"
+                  placeholder="1HGBH41JXMN109186"
+                  className={`flex-1 px-3 py-2 rounded-lg border text-sm bg-white text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-brand/50 ${
+                    errors.vin ? 'border-error' : 'border-border'
+                  }`}
+                  {...register('vin')}
+                />
+                <button
+                  type="button"
+                  onClick={handleVinLookup}
+                  disabled={vin?.length !== 17 || lookingUp}
+                  aria-label="Lookup VIN"
+                  className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-border text-sm font-medium text-text-secondary hover:text-text-primary hover:border-brand transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  <Search size={14} className={lookingUp ? 'animate-spin' : ''} />
+                  {lookingUp ? 'Looking up…' : 'Lookup'}
+                </button>
+              </div>
+              {errors.vin && <p className="text-xs text-error mt-1">{errors.vin.message}</p>}
+            </div>
 
             <div className="flex gap-3">
               <div className="flex-1">

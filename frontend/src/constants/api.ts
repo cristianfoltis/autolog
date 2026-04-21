@@ -13,4 +13,5 @@ export const API_ROUTES = {
     MAKES: '/lov/makes',
     MODELS: (makeId: number) => `/lov/models?makeId=${makeId}`,
   },
+  VIN: (vin: string) => `/vin/${vin}`,
 } as const;

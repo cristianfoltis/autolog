@@ -8,12 +8,14 @@ vi.mock('../../hooks/useCreateVehicle', () => ({ useCreateVehicle: vi.fn() }));
 vi.mock('../../hooks/useUpdateVehicle', () => ({ useUpdateVehicle: vi.fn() }));
 vi.mock('../../hooks/useMakes', () => ({ useMakes: vi.fn() }));
 vi.mock('../../hooks/useModels', () => ({ useModels: vi.fn() }));
-vi.mock('sonner', () => ({ toast: { success: vi.fn() } }));
+vi.mock('../../hooks/useVinLookup', () => ({ useVinLookup: vi.fn() }));
+vi.mock('sonner', () => ({ toast: { success: vi.fn(), warning: vi.fn() } }));
 
 import { useCreateVehicle } from '../../hooks/useCreateVehicle';
 import { useUpdateVehicle } from '../../hooks/useUpdateVehicle';
 import { useMakes } from '../../hooks/useMakes';
 import { useModels } from '../../hooks/useModels';
+import { useVinLookup } from '../../hooks/useVinLookup';
 import * as sonner from 'sonner';
 
 const mockMakes = [
@@ -50,6 +52,7 @@ beforeEach(() => {
   } as any);
   vi.mocked(useMakes).mockReturnValue({ data: mockMakes } as any);
   vi.mocked(useModels).mockReturnValue({ data: mockModels } as any);
+  vi.mocked(useVinLookup).mockReturnValue({ mutate: vi.fn(), isPending: false } as any);
 });
 
 describe('VehicleFormModal', () => {
@@ -159,6 +162,88 @@ describe('VehicleFormModal', () => {
     renderWithProviders(<VehicleFormModal onClose={onClose} />);
     fireEvent.click(screen.getByRole('button', { name: /cancel/i }));
     expect(onClose).toHaveBeenCalled();
+  });
+
+  it('shows loading state on the Lookup button while looking up', () => {
+    vi.mocked(useVinLookup).mockReturnValue({ mutate: vi.fn(), isPending: true } as any);
+    renderWithProviders(<VehicleFormModal onClose={vi.fn()} />);
+    expect(screen.getByRole('button', { name: /lookup vin/i })).toBeDisabled();
+    expect(screen.getByText('Looking up…')).toBeInTheDocument();
+  });
+
+  it('Lookup button is disabled when VIN is shorter than 17 characters', () => {
+    renderWithProviders(<VehicleFormModal onClose={vi.fn()} />);
+    fireEvent.change(screen.getByPlaceholderText('1HGBH41JXMN109186'), {
+      target: { value: 'SHORT' },
+    });
+    expect(screen.getByRole('button', { name: /lookup vin/i })).toBeDisabled();
+  });
+
+  it('Lookup button is enabled when VIN is exactly 17 characters', () => {
+    renderWithProviders(<VehicleFormModal onClose={vi.fn()} />);
+    fireEvent.change(screen.getByPlaceholderText('1HGBH41JXMN109186'), {
+      target: { value: 'VSSZZZ5FZGR117755' },
+    });
+    expect(screen.getByRole('button', { name: /lookup vin/i })).toBeEnabled();
+  });
+
+  it('fills year, make, and model and shows success toast on full VIN match', async () => {
+    const mutate = vi
+      .fn()
+      .mockImplementation((_vin: string, { onSuccess }: { onSuccess: (r: object) => void }) =>
+        onSuccess({ year: 2016, makeId: 1, makeName: 'Audi', modelId: 1, modelName: 'A4' }),
+      );
+    vi.mocked(useVinLookup).mockReturnValue({ mutate, isPending: false } as any);
+
+    renderWithProviders(<VehicleFormModal onClose={vi.fn()} />);
+    fireEvent.change(screen.getByPlaceholderText('1HGBH41JXMN109186'), {
+      target: { value: 'VSSZZZ5FZGR117755' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: /lookup vin/i }));
+
+    await waitFor(() => {
+      expect(sonner.toast.success).toHaveBeenCalledWith('Found: Audi A4 (2016)');
+    });
+  });
+
+  it('fills year and make and shows warning toast on partial VIN match', async () => {
+    const mutate = vi
+      .fn()
+      .mockImplementation((_vin: string, { onSuccess }: { onSuccess: (r: object) => void }) =>
+        onSuccess({ year: 2016, makeId: 1, makeName: 'Audi', modelId: null, modelName: null }),
+      );
+    vi.mocked(useVinLookup).mockReturnValue({ mutate, isPending: false } as any);
+
+    renderWithProviders(<VehicleFormModal onClose={vi.fn()} />);
+    fireEvent.change(screen.getByPlaceholderText('1HGBH41JXMN109186'), {
+      target: { value: 'VSSZZZ5FZGR117755' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: /lookup vin/i }));
+
+    await waitFor(() => {
+      expect(sonner.toast.warning).toHaveBeenCalledWith(
+        'Found: Audi (2016). Please select the model.',
+      );
+    });
+  });
+
+  it('shows warning toast when VIN lookup finds no match', async () => {
+    const mutate = vi
+      .fn()
+      .mockImplementation((_vin: string, { onError }: { onError: () => void }) => onError());
+    vi.mocked(useVinLookup).mockReturnValue({ mutate, isPending: false } as any);
+
+    renderWithProviders(<VehicleFormModal onClose={vi.fn()} />);
+    fireEvent.change(screen.getByPlaceholderText('1HGBH41JXMN109186'), {
+      target: { value: 'VSSZZZ5FZGR117755' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: /lookup vin/i }));
+
+    await waitFor(() => {
+      expect(sonner.toast.warning).toHaveBeenCalledWith(
+        'VIN not recognised. Please fill in the details manually.',
+      );
+    });
   });
 
   it('calls toast.success and onClose on successful create', async () => {
