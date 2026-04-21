@@ -202,6 +202,42 @@ describe('PUT /vehicles/:id', () => {
     expect(res.status).toBe(500);
   });
 
+  it('includes all provided fields in the update payload', async () => {
+    vi.mocked(updateVehicle).mockResolvedValue(mockVehicle);
+
+    const fullUpdate = {
+      plate: 'B-999-XYZ',
+      year: 2021,
+      vin: 'VSSZZZ5FZGR117755',
+      mileage: 60000,
+      mileageUnit: 'km',
+      makeId: 2,
+      modelId: 3,
+    };
+
+    await request(app)
+      .put('/vehicles/vehicle-1')
+      .set('Authorization', `Bearer ${token}`)
+      .send(fullUpdate);
+
+    expect(updateVehicle).toHaveBeenCalledWith(
+      'vehicle-1',
+      'user-1',
+      expect.objectContaining({ vin: 'VSSZZZ5FZGR117755', mileageUnit: 'km', year: 2021 }),
+    );
+  });
+
+  it('omits undefined fields from the update payload', async () => {
+    vi.mocked(updateVehicle).mockResolvedValue(mockVehicle);
+
+    await request(app)
+      .put('/vehicles/vehicle-1')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ plate: 'NEW-PLATE' });
+
+    expect(updateVehicle).toHaveBeenCalledWith('vehicle-1', 'user-1', { plate: 'NEW-PLATE' });
+  });
+
   it('returns 409 when updated plate already exists', async () => {
     vi.mocked(updateVehicle).mockRejectedValue(
       new PrismaClientKnownRequestError('Unique constraint failed', {

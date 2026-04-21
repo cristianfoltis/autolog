@@ -9,6 +9,8 @@ vi.mock('../hooks/useCreateVehicle', () => ({ useCreateVehicle: vi.fn() }));
 vi.mock('../hooks/useUpdateVehicle', () => ({ useUpdateVehicle: vi.fn() }));
 vi.mock('../hooks/useMakes', () => ({ useMakes: vi.fn() }));
 vi.mock('../hooks/useModels', () => ({ useModels: vi.fn() }));
+vi.mock('../hooks/useVinLookup', () => ({ useVinLookup: vi.fn() }));
+vi.mock('sonner', () => ({ toast: { success: vi.fn(), error: vi.fn() } }));
 vi.mock('../context/AuthContext', async (importOriginal) => {
   const actual = await importOriginal<typeof import('../context/AuthContext')>();
   return { ...actual, useAuth: vi.fn() };
@@ -21,6 +23,8 @@ import { useUpdateVehicle } from '../hooks/useUpdateVehicle';
 import { useMakes } from '../hooks/useMakes';
 import { useModels } from '../hooks/useModels';
 import { useAuth } from '../context/AuthContext';
+import { useVinLookup } from '../hooks/useVinLookup';
+import * as sonner from 'sonner';
 
 const mockUser = { id: 'u-1', email: 'test@test.com', name: 'Test User' };
 
@@ -59,6 +63,7 @@ beforeEach(() => {
   } as any);
   vi.mocked(useMakes).mockReturnValue({ data: [], isLoading: false } as any);
   vi.mocked(useModels).mockReturnValue({ data: [], isLoading: false } as any);
+  vi.mocked(useVinLookup).mockReturnValue({ mutate: vi.fn(), isPending: false } as any);
 });
 
 describe('VehiclesPage', () => {
@@ -160,6 +165,60 @@ describe('VehiclesPage', () => {
     await waitFor(() => {
       expect(screen.queryByText('Add vehicle', { selector: 'h2' })).not.toBeInTheDocument();
     });
+  });
+
+  it('calls toast.success after successful delete', () => {
+    const mutate = vi
+      .fn()
+      .mockImplementation((_id: string, { onSuccess }: { onSuccess: () => void }) => onSuccess());
+    vi.mocked(useDeleteVehicle).mockReturnValue({ mutate } as any);
+    vi.mocked(useVehicles).mockReturnValue({ data: [mockVehicle], isLoading: false } as any);
+    vi.spyOn(globalThis, 'confirm').mockReturnValue(true);
+
+    renderWithProviders(<VehiclesPage />);
+    fireEvent.click(screen.getByLabelText('Delete vehicle'));
+
+    expect(sonner.toast.success).toHaveBeenCalledWith('Vehicle removed');
+  });
+
+  it('calls toast.error after failed delete', () => {
+    const mutate = vi
+      .fn()
+      .mockImplementation((_id: string, { onError }: { onError: () => void }) => onError());
+    vi.mocked(useDeleteVehicle).mockReturnValue({ mutate } as any);
+    vi.mocked(useVehicles).mockReturnValue({ data: [mockVehicle], isLoading: false } as any);
+    vi.spyOn(globalThis, 'confirm').mockReturnValue(true);
+
+    renderWithProviders(<VehiclesPage />);
+    fireEvent.click(screen.getByLabelText('Delete vehicle'));
+
+    expect(sonner.toast.error).toHaveBeenCalledWith('Failed to delete vehicle');
+  });
+
+  it('closes edit modal when onClose is called', async () => {
+    vi.mocked(useVehicles).mockReturnValue({ data: [mockVehicle], isLoading: false } as any);
+    renderWithProviders(<VehiclesPage />);
+
+    fireEvent.click(screen.getByLabelText('Edit vehicle'));
+    await waitFor(() => screen.getByRole('heading', { name: 'Edit vehicle' }));
+
+    fireEvent.click(screen.getByRole('button', { name: 'Close' }));
+    await waitFor(() => {
+      expect(screen.queryByRole('heading', { name: 'Edit vehicle' })).not.toBeInTheDocument();
+    });
+  });
+
+  it('falls back to email when user has no name', () => {
+    vi.mocked(useAuth).mockReturnValue({
+      user: { id: 'u-1', email: 'test@test.com', name: null } as any,
+      token: 'tok',
+      login: vi.fn(),
+      logout: vi.fn(),
+      isAuthenticated: true,
+    });
+    vi.mocked(useVehicles).mockReturnValue({ data: [], isLoading: false } as any);
+    renderWithProviders(<VehiclesPage />);
+    expect(screen.getByText('test@test.com')).toBeInTheDocument();
   });
 
   it('calls logout when Sign out is clicked', () => {

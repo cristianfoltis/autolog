@@ -5,6 +5,7 @@ import passport from './config/passport';
 import authRoutes from './routes/auth.routes';
 import lovRoutes from './routes/lov.routes';
 import vehicleRoutes from './routes/vehicle.routes';
+import vinRoutes from './routes/vin.routes';
 
 export const app = express();
 
@@ -25,6 +26,7 @@ app.get('/health', (_req, res) => {
 app.use('/auth', authRoutes);
 app.use('/lov', lovRoutes);
 app.use('/vehicles', vehicleRoutes);
+app.use('/vin', vinRoutes);
 
 app.use((err: Error, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
   console.error(err);
