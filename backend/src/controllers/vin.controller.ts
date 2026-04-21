@@ -21,7 +21,8 @@ export async function lookupVinHandler(
   }
 
   try {
-    const apiRes = await fetch(`https://api.auto.dev/vin/${vin}`, {
+    const vinUrl = new URL(`/vin/${encodeURIComponent(vin)}`, 'https://api.auto.dev');
+    const apiRes = await fetch(vinUrl, {
       headers: { Authorization: `Bearer ${process.env.AUTO_DEV_API_KEY}` },
     });
 

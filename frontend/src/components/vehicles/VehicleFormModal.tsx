@@ -56,7 +56,7 @@ export function VehicleFormModal({ vehicle, onClose }: Props) {
   const { mutate: lookupVin, isPending: lookingUp } = useVinLookup();
 
   function handleVinLookup() {
-    if (!vin || vin.length !== 17) return;
+    if (vin?.length !== 17) return;
     lookupVin(vin, {
       onSuccess: (result) => {
         setValue('year', result.year);
@@ -199,7 +199,7 @@ export function VehicleFormModal({ vehicle, onClose }: Props) {
                 <button
                   type="button"
                   onClick={handleVinLookup}
-                  disabled={!vin || vin.length !== 17 || lookingUp}
+                  disabled={vin?.length !== 17 || lookingUp}
                   aria-label="Lookup VIN"
                   className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-border text-sm font-medium text-text-secondary hover:text-text-primary hover:border-brand transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                 >
